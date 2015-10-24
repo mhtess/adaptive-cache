@@ -1,47 +1,11 @@
-// var plentifulWorlds = function(propObject){
-//   var pO = map(second,_.pairs(propObject)) // function designed for list of lists
-//   var fOR = function(v1,v2){
-//     return map2(function(e1,e2){return e1 || e2}, v1, v2)
-//   }
-//   return reduce(function(e1,e2){return e1 && e2}, 1, (reduce(fOR,[0,0,0],pO)))
-// }
+// quantifierEquivalence goes from a representation of objects with properties
+// to a representation of the relations between the properties
+// (spec., the truth-value of possible quantifier utterances)
+// this is useful preprocessing for models that do inference over states (e.g. RSA) 
+// where the identity of the objects doesn't matter, since the state space (that goes into RSA)
+// doesn't depend upon the number of objects (but is fixed to space of sentences)
 
-// var meaning = function(quantifier) {
-
-// }
-
-
-// var getProperties = function(obj, backgroundPrior) {
-//   var p = propertyTuples[discrete(backgroundPrior)]
-//   return p
-// }
-
-// var quantifierEquivalence = cache(function(n_objects, base_rate){
-//   Enumerate(function(){
-
-//     var 
-
-
-
-
-//     var nonEmptyWorld = plentifulWorlds(propertiesOfObjects) 
-//     factor(nonEmptyWorld?0:-Infinity)
-
-//     return map(function(sentence)
-//       {return meaning(sentence[1])(propertiesOfObjects,
-//                                     sentence[0][0],
-//                                     sentence[0][1])}, 
-//       syllogisticSentences)
-//   })
-// })
-var n_objects = 4
-var base_rate = 0.4
-var As = repeat(n_objects, function(x){return flip(base_rate)})
-var Bs = repeat(n_objects, function(x){return flip(base_rate)})
-
-
-// As
-
+// logic
 var A_is_B = function(obj){
   return (obj[0] && obj[1])
 }
@@ -66,32 +30,46 @@ var meaning = function(quantifier){
          true
 }
 
+var utterances = ["all","some","not all","none"]
+var properties =  ["A","B","C"]
 
-// var As = [ false, false, true, true ]
-// var Bs = [ false, true, false, false ]
+var propertyOrders = _.flatten(
+  map(function(p){
+    var props = ["A","B","C"]
+    props.splice(props.indexOf(p), 1)
+    return map(function(x){return [x,p]}, props)
+  }, properties), 
+true)
 
-// console.log(As)
-// console.log(As)
-console.log(As)
-console.log(Bs)
+// utterances are a quantifier relation, and two properties (e.g. some As are Bs)
+var utterancesAboutProperties = _.flatten(map(function(q){
+  return map(function(o){
+    return [q, o]
+  }, propertyOrders)
+}, utterances), true)
 
-console.log(meaning("all")(As, Bs))
-console.log(meaning("not all")(As, Bs))
-console.log(meaning("some")(As, Bs))
-console.log(meaning("none")(As, Bs))
+var quantifierEquivalence = cache(function(n_objects, base_rate){
+  Enumerate(function(){
 
-// any(A_is_B, As, Bs)
+    // objects, lists of properties: order corresponds to object id
+    var objects = {
+      A: repeat(n_objects, function(x){return flip(base_rate)}),
+      B: repeat(n_objects, function(x){return flip(base_rate)}),
+      C: repeat(n_objects, function(x){return flip(base_rate)})
+    }
 
-// var no_A_are_B = function(a, b){
-//   return !(any(A_is_B, _.zip(a,b)) && any(function(x){return x}, a))
-// }
+    // for each possible utterance -- property pairing
+    // compute truth value
+   return _.object(map(function(utt){
+      var q = utt[0]
+      var property1 = utt[1][0]
+      var property2 = utt[1][1]
+      return [utt.join(''), 
+              meaning(q)(objects[property1], objects[property2])]
+    },utterancesAboutProperties))
 
-// var not_all_A_are_B = function(a, b){
-//   return !(all(A_is_B, _.zip(a,b)))
-// }
+  })
+})
 
 
-// all(function(x){return x}, allSentence(As, Bs))
-
-// _.zip(As,Bs)
-// zip(As,Bs)
+quantifierEquivalence(3, 0.25)
