@@ -3,6 +3,10 @@ Bayesian adaptive cacheing for expensive models
 
 # Notes
 
+```mathjax
+F:X->Y
+```
+
 Say we have a (deterministic?) function $F:X->Y$ that is expensive to compute and we expect to be calling it a lot on "similar" X values inside some other computation. (eg. RSA with continuous state space, so $$$X$$$ is $$$R^n$$$ while $$$Y$$$ is a distribution over utterances or states.) 
 
 say we can write a prior over (potentially stochastic) functions X->Y as a probabilistic program P with latent parameters \theta.
