@@ -1,0 +1,97 @@
+// var plentifulWorlds = function(propObject){
+//   var pO = map(second,_.pairs(propObject)) // function designed for list of lists
+//   var fOR = function(v1,v2){
+//     return map2(function(e1,e2){return e1 || e2}, v1, v2)
+//   }
+//   return reduce(function(e1,e2){return e1 && e2}, 1, (reduce(fOR,[0,0,0],pO)))
+// }
+
+// var meaning = function(quantifier) {
+
+// }
+
+
+// var getProperties = function(obj, backgroundPrior) {
+//   var p = propertyTuples[discrete(backgroundPrior)]
+//   return p
+// }
+
+// var quantifierEquivalence = cache(function(n_objects, base_rate){
+//   Enumerate(function(){
+
+//     var 
+
+
+
+
+//     var nonEmptyWorld = plentifulWorlds(propertiesOfObjects) 
+//     factor(nonEmptyWorld?0:-Infinity)
+
+//     return map(function(sentence)
+//       {return meaning(sentence[1])(propertiesOfObjects,
+//                                     sentence[0][0],
+//                                     sentence[0][1])}, 
+//       syllogisticSentences)
+//   })
+// })
+var n_objects = 4
+var base_rate = 0.4
+var As = repeat(n_objects, function(x){return flip(base_rate)})
+var Bs = repeat(n_objects, function(x){return flip(base_rate)})
+
+
+// As
+
+var A_is_B = function(obj){
+  return (obj[0] && obj[1])
+}
+
+var not_A = function(obj){
+  return !(obj[0])
+}
+
+var all_A_are_B = function(a, b){
+  return all(function(x){return (not_A(x) || A_is_B(x))}, _.zip(a,b))
+}
+
+var some_A_are_B = function(a, b){
+  return any(A_is_B, _.zip(a,b)) && any(function(x){return x}, a)
+}
+
+var meaning = function(quantifier){
+  return quantifier=="all"? all_A_are_B :
+         quantifier=="some"? some_A_are_B :
+         quantifier=="none"? function(a,b){return !(some_A_are_B(a,b))} :
+         quantifier=="not all"? function(a,b){return !(all_A_are_B(a,b))} : 
+         true
+}
+
+
+// var As = [ false, false, true, true ]
+// var Bs = [ false, true, false, false ]
+
+// console.log(As)
+// console.log(As)
+console.log(As)
+console.log(Bs)
+
+console.log(meaning("all")(As, Bs))
+console.log(meaning("not all")(As, Bs))
+console.log(meaning("some")(As, Bs))
+console.log(meaning("none")(As, Bs))
+
+// any(A_is_B, As, Bs)
+
+// var no_A_are_B = function(a, b){
+//   return !(any(A_is_B, _.zip(a,b)) && any(function(x){return x}, a))
+// }
+
+// var not_all_A_are_B = function(a, b){
+//   return !(all(A_is_B, _.zip(a,b)))
+// }
+
+
+// all(function(x){return x}, allSentence(As, Bs))
+
+// _.zip(As,Bs)
+// zip(As,Bs)
