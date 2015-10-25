@@ -1,0 +1,51 @@
+// webppl syllogisticRSA.wppl --require utils
+
+// syllogistic space 
+
+var possiblePremises = subset(utterancesAboutProperties, "type", "premise")
+
+var premiseForms = {"1":[["B","A"],["C","B"]],
+                  "2":[["A","B"],["C","B"]],
+                  "3":[["B","A"],["B","C"]],
+                  "4":[["A","B"],["B","C"]]}
+
+var scholasticDict = _.invert({"all":"A","none":"E","some":"I","not all":"O"})
+
+
+var scholasticCodeToPremises = function(code){
+  var p = premiseForms[code[2]]
+  var premise1 = {quantifier: scholasticDict[code[0]],
+                  terms: p[0],
+                  type:'premise'}
+  var premise2 = {quantifier: scholasticDict[code[1]],
+                  terms: p[1],
+                  type:"premise"}
+  return [premise1, premise2]
+}
+
+var literalReasoner = function(prior, premises) {
+
+  Enumerate(function(){
+
+    var equivalenceState = sample(prior)
+    var truePremises = subset(equivalenceState, "type", "premise")
+
+    condition(all(function(x){
+            return utils.containsObject(x, truePremises)
+              }, premises))
+
+    var trueConclusions = subset(equivalenceState, "type", "conclusion")
+    var conclusion = uniformDraw(trueConclusions)
+
+
+
+
+    return conclusion["quantifier"]+"_"+conclusion["terms"]
+  })
+}
+
+
+var priorERP = quantifierEquivalence({n_objects: 4, base_rate: 0.25})
+literalReasoner(priorERP, scholasticCodeToPremises("AA1"))
+
+
