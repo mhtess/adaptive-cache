@@ -4,6 +4,8 @@ Bayesian adaptive cacheing for expensive models
 # Notes
 (Summarized from a note by @ngoodman 10/23/15)
 
+N.B. @ngoodman has related work [here](https://github.com/ngoodman/nestedbayes)
+
 ### Set up
 
 Say we have a (deterministic?) function F:X->Y that is expensive to compute and we expect to be calling it a lot on "similar" X values inside some other computation. (eg. RSA with continuous state space, so X is R^n while Y is a distribution over utterances or states.) 
