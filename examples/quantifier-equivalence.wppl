@@ -14,6 +14,12 @@ var not_A = function(obj){
   return !(obj[0])
 }
 
+var is_an_A_B_C = function(objs){
+  return all(function(k){
+    return any(function(x){return x}, objs[k])
+  },_.keys(objs))
+}
+
 var all_A_are_B = function(a, b){
   return all(function(x){return (not_A(x) || A_is_B(x))}, _.zip(a,b))
 }
@@ -58,6 +64,9 @@ var quantifierEquivalence = cache(function(n_objects, base_rate){
       C: repeat(n_objects, function(x){return flip(base_rate)})
     }
 
+    // optionally, condition on there being each property present in at least one object
+    factor(is_an_A_B_C(objects) ? 0 : -Infinity)
+
     // for each possible utterance -- property pairing
     // compute truth value
    return _.object(map(function(utt){
@@ -70,6 +79,5 @@ var quantifierEquivalence = cache(function(n_objects, base_rate){
 
   })
 })
-
 
 quantifierEquivalence(3, 0.25)
