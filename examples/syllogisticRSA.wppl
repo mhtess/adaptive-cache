@@ -23,10 +23,8 @@ var scholasticCodeToPremises = function(code){
   return [premise1, premise2]
 }
 
-var literalReasoner = function(prior, premises) {
-
+var literalReasoner = cache(function(prior, premises) {
   Enumerate(function(){
-
     var equivalenceState = sample(prior)
     var truePremises = subset(equivalenceState, "type", "premise")
 
@@ -37,15 +35,54 @@ var literalReasoner = function(prior, premises) {
     var trueConclusions = subset(equivalenceState, "type", "conclusion")
     var conclusion = uniformDraw(trueConclusions)
 
+    return conclusion
+  })
+})
 
+var experimenter = cache(function(prior, conclusion) {
+  Enumerate(function(){
+    var premise1 = {
+      quantifier: uniformDraw(utterances),
+      terms: uniformDraw([["B","A"],["A","B"]]),
+      type: 'premise'
+    }
+    var premise2 = {
+      quantifier: uniformDraw(utterances),
+      terms: uniformDraw([["B","C"],["C","B"]]),
+      type: 'premise'
+    }
+    var premises = [premise1, premise2]
 
+    var R0 = literalReasoner(prior, premises)
+
+    factor(R0.score([],conclusion))
+    
+    return premises
+  })
+})
+
+var pragmaticReasoner = function(prior, premises, lambda) {
+  Enumerate(function(){
+    var equivalenceState = sample(prior)
+
+    var trueConclusions = subset(equivalenceState, "type", "conclusion")
+    var conclusion = uniformDraw(trueConclusions)
+
+    var E1 = experimenter(prior, conclusion)
+
+    factor(lambda*E1.score([],premises))
 
     return conclusion["quantifier"]+"_"+conclusion["terms"]
   })
 }
 
 
-var priorERP = quantifierEquivalence({n_objects: 4, base_rate: 0.25})
-literalReasoner(priorERP, scholasticCodeToPremises("AA1"))
+var premises = [ 
+  { quantifier: 'all', terms: [ 'B', 'A' ], type: 'premise' },
+  { quantifier: 'all', terms: [ 'C', 'B' ], type: 'premise' } 
+  ]
 
+var priorERP = quantifierEquivalence({n_objects: 4, base_rate: 0.25})
+
+pragmaticReasoner(priorERP, premises, 2)
 
