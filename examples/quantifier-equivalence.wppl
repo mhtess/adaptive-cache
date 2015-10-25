@@ -1,9 +1,19 @@
+// webppl quantifier-equivalence.wppl --require utils
+
 // quantifierEquivalence goes from a representation of objects with properties
 // to a representation of the relations between the properties
 // (spec., the truth-value of possible quantifier utterances)
 // this is useful preprocessing for models that do inference over states (e.g. RSA) 
 // where the identity of the objects doesn't matter, since the state space (that goes into RSA)
 // doesn't depend upon the number of objects (but is fixed to space of sentences)
+
+// helpers
+
+// var subset = function(df, field, value){ 
+//  return filter(function(d){
+//    return (d[field]==value)
+//  },df)
+// }
 
 // logic
 var A_is_B = function(obj){
@@ -47,15 +57,27 @@ var propertyOrders = _.flatten(
   }, properties), 
 true)
 
+var isPremise = function(terms){
+  return !((terms[0]=='C') && (terms[1]=='A') || (terms[0]=='A') && (terms[1]=='C'))
+}
+
 // utterances are a quantifier relation, and two properties (e.g. some As are Bs)
 var utterancesAboutProperties = _.flatten(map(function(q){
   return map(function(o){
-    return [q, o]
+    return {
+      quantifier:q, 
+      terms:o,
+      type: isPremise(o) ? 'premise' : 'conclusion'
+          }
   }, propertyOrders)
 }, utterances), true)
 
+var possiblePremises = subset(utterancesAboutProperties, "type", "premise")
+
+
 var quantifierEquivalence = cache(function(n_objects, base_rate){
   Enumerate(function(){
+// var quantifierEquivalence = function(n_objects, base_rate){
 
     // objects, lists of properties: order corresponds to object id
     var objects = {
@@ -69,15 +91,43 @@ var quantifierEquivalence = cache(function(n_objects, base_rate){
 
     // for each possible utterance -- property pairing
     // compute truth value
-   return _.object(map(function(utt){
-      var q = utt[0]
-      var property1 = utt[1][0]
-      var property2 = utt[1][1]
-      return [utt.join(''), 
-              meaning(q)(objects[property1], objects[property2])]
-    },utterancesAboutProperties))
+   return map(function(utt){
+      var utt1 = utt
+      var q = utt["quantifier"]
+      var props = utt["terms"]
+      return [
+              utt1,
+              meaning(q)(objects[props[0]], objects[props[1]])
+              ]
+    },utterancesAboutProperties)
 
-  })
+  }
+  )
 })
 
-quantifierEquivalence(3, 0.25)
+var literalReasoner = function(prior) {
+
+  Enumerate(function(){
+
+    var equivalenceState = sample(prior)
+    // mapping from worlds to sentences, conclusions
+    var sentences = trueSentences(equivalenceState)
+    var trueConclusions = subset(sentences, "type", "conclusion")
+    var truePremises = subset(sentences, "type", "premises")
+
+    var conclusion = uniformDraw(trueConclusions)
+
+    // var listConclusions = trueLists(trueConclusions)
+    // var whichConclusions = uniformDraw(listConclusions)
+
+    // factor(premisesTrue(premises, trueSentences) ? 0 : -Infinity)
+
+    return conclusion 
+  })
+}
+
+var priorERP = quantifierEquivalence(4, 0.25)
+literalReasoner(priorERP)
+
+
+
