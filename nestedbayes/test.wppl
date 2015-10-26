@@ -7,13 +7,14 @@ var foo = function(v, i) {
   
 }
 
-var cfoo = gpcache.cache(foo, 2)
+var cfoo = gputils.cache(foo, 2)
 
-display( cfoo([1,1], 0) )
-display( cfoo([1,1], 1) )
-display( cfoo([1.1,1], 0) )
-display( cfoo([1.2,1], 0) )
-display( cfoo([1,4], 0) )
+console.log( cfoo([1,1], 0) )
+console.log( cfoo([1,1], 1) )
+console.log( cfoo([1.1,1], 0) )
+console.log( cfoo([1.2,1], 0) )
+console.log( cfoo([1,4], 0) )
 
 
+cfoo([1,4], 0)
 
