@@ -1,0 +1,19 @@
+
+
+var foo = function(v, i) {
+  var x = v[0]
+  var y = v[1]
+  return x*x*x - y*x*x
+  
+}
+
+var cfoo = gpcache.cache(foo, 2)
+
+display( cfoo([1,1], 0) )
+display( cfoo([1,1], 1) )
+display( cfoo([1.1,1], 0) )
+display( cfoo([1.2,1], 0) )
+display( cfoo([1,4], 0) )
+
+
+
