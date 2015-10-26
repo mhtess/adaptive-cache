@@ -1,5 +1,4 @@
-nestedbayes
-===========
+Taken from @ngoodman [nestedbayes](https://github.com/ngoodman/nestedbayes) 10/26/15
 
 Thinking through "nested-query" WebPPL models -- those where conditioning is nested inside conditioning. These are called doubly intractable in stats.
 
