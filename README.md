@@ -44,13 +44,13 @@ In terms of implementation, I'm imagining using webppl (or vipp) directly to han
 
 There should be a straightforward extension to the case where our evaluation results in a noisy approximation to F (e.g. from running MCMC). Should think through.
 
-For structured cases, we can encode knowledge in prior P: e.g. "this region will have the same value, whatever it is". or, "the function decomposes into factors".
-
-This extends to functions where input and output spaces (X and Y) are not continuous (or, mixtures of discrete and continuous) as long as a plausible but flexible prior over functions can be given. e.g. are there cases where it helps for ordinal domains (tendency to assume that neighboring integers are similar)?
+It might be possible to track the time taken by each evaluation of F, infer a surrogate to this time (or other resource) function, and use it as part of the decision of whether to run F(X) for a new X. I.e., one could do a resource-rational (bayesian decision theory) computation using the surrogate resource function. This will be particularly useful for nested-query models with parameters over the state space (e.g. over the alternatives in RSA).
 
 Above we considered fixed confidence bounds to decide whether or not to run F. This bound could adapt. For example, it could drop over time to result in asymptotic correctness. It could also be set to achieve a target computation rate: Aim for X evals of F per minute or something.
 
-It might be possible to track the time taken by each evaluation of F, infer a surrogate to this time (or other resource) function, and use it as part of the decision of whether to run F(X) for a new X. I.e., one could do a resource-rational (bayesian decision theory) computation using the surrogate resource function.
+This extends to functions where input and output spaces (X and Y) are not continuous (or, mixtures of discrete and continuous) as long as a plausible but flexible prior over functions can be given. e.g. are there cases where it helps for ordinal domains (tendency to assume that neighboring integers are similar)?
+
+For structured cases, we can encode knowledge in prior P: e.g. "this region will have the same value, whatever it is". or, "the function decomposes into factors".
 
 
 ### Applications / related areas
